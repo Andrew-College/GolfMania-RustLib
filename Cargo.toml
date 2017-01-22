@@ -1,0 +1,6 @@
+[package]
+name = "GolfManiaLib"
+version = "0.1.0"
+authors = ["Andrew Sansom <andrewsansomwork@gmail.com>"]
+
+[dependencies]
