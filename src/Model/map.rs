@@ -17,12 +17,12 @@ pub enum MapName {
 }
 
 #[derive(Debug)]
-pub struct cell {
+pub struct Cell {
     _foreground: char,
     _background: char,
 }
 
-impl cell {
+impl Cell {
     pub fn fore(&self) -> &char {
         &self._foreground
     }
@@ -31,38 +31,38 @@ impl cell {
         &self._background
     }
 
-    pub fn from_string(input: &str) -> Vec<cell> {
+    pub fn from_string(input: &str) -> Vec<Cell> {
             input
                 .chars()
                 .map(
                     |ch| match ch {
                         'H' =>
-                            cell {
+                            Cell {
                                 _foreground: ' ',
                                 _background: 'H'
                             },
                         '|' =>
-                            cell {
+                            Cell {
                                 _foreground: '|',
                                 _background: '|'
                             },
                         '_' =>
-                            cell {
+                            Cell {
                                 _foreground: '_',
                                 _background: '_'
                             },
                         '*' =>
-                            cell {
+                            Cell {
                                 _foreground: '*',
                                 _background: ','
                             },
                         '#' =>
-                            cell {
+                            Cell {
                                 _foreground: ' ',
                                 _background: '#'
                             },
                         _ =>
-                            cell {
+                            Cell {
                                 _foreground: ' ',
                                 _background: ',',
                             },
@@ -76,7 +76,7 @@ impl cell {
 #[derive(Debug)]
 pub struct Map {
     _name: String,
-    _board: Vec<Vec<cell>>
+    _board: Vec<Vec<Cell>>
 }
 
 impl Map {
@@ -84,7 +84,7 @@ impl Map {
         &self._name
     }
 
-    pub fn board(&self) -> &Vec<Vec<cell>> {
+    pub fn board(&self) -> &Vec<Vec<Cell>> {
         &self._board
     }
 
@@ -128,21 +128,21 @@ impl Map {
 }
 
 trait MapCompiler {
-     fn compile_string<'a>(&self) -> Vec<Vec<cell>>;
+     fn compile_string<'a>(&self) -> Vec<Vec<Cell>>;
 }
 
 impl MapCompiler for str {
-     fn compile_string<'a>(&self) -> Vec<Vec<cell>> {
+     fn compile_string<'a>(&self) -> Vec<Vec<Cell>> {
         self
             .lines()
-            .map( |line| cell::from_string(line) )
+            .map( |line| Cell::from_string(line) )
             .collect()
      }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::{Map, cell};
+    use super::{Map, Cell};
 
     #[test]
     fn first_background_char_of_tutorial() {
