@@ -4,3 +4,5 @@ version = "0.1.0"
 authors = ["Andrew Sansom <andrewsansomwork@gmail.com>"]
 
 [dependencies]
+derive_builder = "0.3.0"
+custom_derive = "0.1.7"
