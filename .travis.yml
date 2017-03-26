@@ -1,0 +1,9 @@
+language: rust
+# uncomment and edit the following line if your project needs to run something other than `rake`:
+rust:
+  - stable
+  - beta
+  - nightly
+matrix:
+  allow_failures:
+    - rust: nightly
