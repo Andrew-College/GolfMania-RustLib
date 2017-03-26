@@ -22,6 +22,7 @@ impl<T> InnerModel<T> {
     }
 
     fn InnerActivate(&mut self) {
+        // Implement this
         unimplemented!();
     }
 
