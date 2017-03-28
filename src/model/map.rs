@@ -24,79 +24,64 @@ pub struct Cell {
 
 impl CellBuilder {
     pub fn build_string(input: &str) -> Result<Vec<Cell>, String> {
-            // Run through the string, building up the Map
-            let mut result = input
-                .chars()
-                .map(
-                    |ch| match ch {
-                        'H' =>
-                            Ok(
-                                Cell {
-                                    foreground: ' ',
-                                    background: 'H'
-                                }
-                            ),
-                        '|' =>
-                            Ok(
-                                Cell {
-                                    foreground: '|',
-                                    background: '|'
-                                }
-                            ),
-                        '_' =>
-                            Ok (
-                                Cell {
-                                    foreground: '_',
-                                    background: '_'
-                                }
-                            ),
-                        '\\' =>
-                            Ok (
-                                Cell {
-                                    foreground: '\\',
-                                    background: '\\'
-                                }
-                            ),
-                        '*' =>
-                            Ok (
-                                Cell {
-                                    foreground: '*',
-                                    background: ','
-                                }
-                            ),
-                        '#' =>
-                            Ok(
-                                Cell {
-                                    foreground: ' ',
-                                    background: '#'
-                                }
-                            ),
-                        ',' =>
-                            Ok(
-                                Cell {
-                                    foreground: ' ',
-                                    background: ',',
-                                }
-                            ),
-                        ex =>
-                            Err(format!("Invalid Character used {}", ex))
-                    }
-                );
-            
-            //let count = result.take_while(Result::is_ok).count();
-            
-            // Jump out early on error
-            for elem in &mut result {
-                match elem {
-                    Err(e) => {
-                        println!("There was an error: {}", e);
-                        return Err(e);
-                    },
-                    _ => {},
+        // Run through the string, building up the Map
+        input
+            .chars()
+            .map(
+                |ch| match ch {
+                    'H' =>
+                        Ok(
+                            Cell {
+                                foreground: ' ',
+                                background: 'H'
+                            }
+                        ),
+                    '|' =>
+                        Ok(
+                            Cell {
+                                foreground: '|',
+                                background: '|'
+                            }
+                        ),
+                    '_' =>
+                        Ok (
+                            Cell {
+                                foreground: '_',
+                                background: '_'
+                            }
+                        ),
+                    '\\' =>
+                        Ok (
+                            Cell {
+                                foreground: '\\',
+                                background: '\\'
+                            }
+                        ),
+                    '*' =>
+                        Ok (
+                            Cell {
+                                foreground: '*',
+                                background: ','
+                            }
+                        ),
+                    '#' =>
+                        Ok(
+                            Cell {
+                                foreground: ' ',
+                                background: '#'
+                            }
+                        ),
+                    ',' =>
+                        Ok(
+                            Cell {
+                                foreground: ' ',
+                                background: ',',
+                            }
+                        ),
+                    ex =>
+                        Err(format!("Invalid Character used {}", ex))
                 }
-            }
-
-            Ok(result.map( |goodch| goodch.unwrap() ).collect())
+            ).collect()
     }
 }
 
@@ -109,6 +94,64 @@ pub struct Map {
 impl Map {
     pub fn name(&self) -> &'static str {
         self.name
+    }
+
+    pub fn board(&self) -> Vec<Vec<Cell>> {
+        self.board.to_vec()
+    }
+
+    pub fn length(&self) -> usize {
+        self.board.len()
+    }
+
+    pub fn width(&self) -> usize {
+        self.board.first().unwrap().len()
+    }
+}
+
+impl<'a> IntoIterator for &'a Map {
+    type Item = Cell;
+    type IntoIter = MapIntoIterator<'a>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        MapIntoIterator { map: self, x: 0, y: 0, direction: Direction::Horizontal }
+    }
+}
+
+#[derive(Debug, Eq, PartialEq)]
+enum Direction {
+    Vertical,
+    Horizontal,
+}
+
+///TODO: Implement direction in next()
+#[derive(Debug, Eq, PartialEq)]
+pub struct MapIntoIterator<'a> {
+    map: &'a Map,
+    x: usize,
+    y: usize,
+    direction: Direction,
+}
+
+impl<'a> Iterator for MapIntoIterator<'a> {
+    type Item = Cell;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.x >= self.map.width() && self.y >= self.map.length() {
+            return None;
+        }
+
+        let result = self.map.board[self.y][self.x];
+
+        if self.x + 1 >= self.map.width() {
+            self.x = 0;
+            self.y += 1;
+        }
+        else {
+            self.x += 1;
+        }
+
+        Some(result)
     }
 }
 
@@ -176,39 +219,39 @@ impl MapBuilder
 mod tests {
     use super::{MapBuilder, CellBuilder};
 
-    // #[test]
-    // fn firstbackground_char_of_tutorial() {
-    //     // let test = MapBuilder::from_named(None);
+    #[test]
+    // Nerd Note: The Tutorial Map is 34X12
+    fn length_and_width() {
+        let test = MapBuilder::from_named(None);
 
-    //     // assert!({
-    //     //     match test {
-    //     //         Err(ex) => panic!("keems"),
-    //     //         Ok(map_val) => {
-    //     //             let the_board = map_val.board;
-    //     //             match the_board.first() {
-    //     //                 Some(column) => column.first().unwrap().background == 'H',
-    //     //                 otherthing => panic!(otherthing),
-    //     //             }
-    //     //         },
-    //     //     }
-    //     // });
+        assert!({
+            match test.clone() {
+                Err(ex) => panic!(ex),
+                Ok(map_val) => {
+                    match map_val.length() {
+                        12 => true,
+                        _ => false
+                    }
+                },
+            }
+        });
 
-    //     // assert_eq!(
-    //     //     test
-    //     //         .unwrap()
-    //     //         .board
-    //     //             .first()
-    //     //                 .unwrap()
-    //     //             .first()
-    //     //                 .unwrap()
-    //     //         .background, 
-    //     //     'H'
-    //     // );
-    // }
+        assert!({
+            match test.clone() {
+                Err(ex) => panic!(ex),
+                Ok(map_val) => {
+                    match map_val.width() {
+                        34 => true,
+                        _ => false
+                    }
+                },
+            }
+        });
+    }
 
     #[test]
     fn invalid_characters_fallback() {
-        let test = CellBuilder::build_string("memes");
+        let test = CellBuilder::build_string("This Does Not Exist");
 
         for test_cell in test {
             assert_eq!(test_cell.first().unwrap().background, ',');
@@ -224,5 +267,24 @@ mod tests {
         };
 
         print!("{:?}", m_test);
+    }
+
+    #[test]
+    fn first_character_from_iterator_test() {
+        let test = MapBuilder::from_named(None).unwrap();
+
+        let test_iter = test.into_iter().next().unwrap();
+        
+        assert!(test_iter.background == 'H');
+    }
+
+    #[test]
+    #[should_panic]
+    fn all_characters_are_not_h() {
+        let test = MapBuilder::from_named(None).unwrap();
+
+        for chara in test.into_iter() {
+            assert!(chara.background == 'H');
+        }
     }
 }
