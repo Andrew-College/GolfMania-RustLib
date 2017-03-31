@@ -275,7 +275,7 @@ mod tests {
     fn invalid_characters_fallback() {
         let test = CellBuilder::build_string("How Does This Not Exist");
 
-        assert!(test.is_err() && test == Err("Invalid Character used T".to_string()));
+        assert!(test.is_err() && test == Err("Invalid Character used o".to_string()));
     }
 
     #[test]
