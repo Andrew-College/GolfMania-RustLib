@@ -79,7 +79,7 @@ impl CellBuilder {
                             }
                         ),
                     ex =>
-                        Err(format!("Invalid Character used {}", ex))
+                        return Err(format!("Invalid Character used {}", ex))
                 }
             ).collect()
     }
@@ -119,18 +119,27 @@ impl<'a> IntoIterator for &'a Map {
 }
 
 #[derive(Debug, Eq, PartialEq)]
-enum Direction {
+pub enum Direction {
     Vertical,
     Horizontal,
 }
 
-///TODO: Implement direction in next()
 #[derive(Debug, Eq, PartialEq)]
 pub struct MapIntoIterator<'a> {
     map: &'a Map,
     x: usize,
     y: usize,
     direction: Direction,
+}
+
+impl<'a> MapIntoIterator<'a> {
+    pub fn change_direction(&mut self, new_direction: Direction) {
+        self.direction = new_direction;
+    }
+
+    pub fn direction(self) -> Direction {
+        self.direction
+    }
 }
 
 impl<'a> Iterator for MapIntoIterator<'a> {
@@ -143,12 +152,25 @@ impl<'a> Iterator for MapIntoIterator<'a> {
 
         let result = self.map.board[self.y][self.x];
 
-        if self.x + 1 >= self.map.width() {
-            self.x = 0;
-            self.y += 1;
-        }
-        else {
-            self.x += 1;
+        match self.direction {
+            Direction::Horizontal => {
+                if self.x + 1 >= self.map.width() {
+                    self.x = 0;
+                    self.y += 1;
+                }
+                else {
+                    self.x += 1;
+                }
+            },
+            Direction::Vertical => {
+                if self.y + 1 >= self.map.length() {
+                    self.y = 0;
+                    self.x += 1;
+                }
+                else {
+                    self.y += 1;
+                }
+            }
         }
 
         Some(result)
@@ -181,31 +203,31 @@ impl MapBuilder
 
     fn load_map(selected_map: MapName) -> Result<Map, String>{
         match selected_map {
-            // MapName::Angled => MapBuilder::default()
-            //     .name("Angled")
-            //     .board(ANGLED.compile_string())
-            //     .build()
-            // ,
-            // MapName::Danger => MapBuilder::default()
-            //     .name("Angled")
-            //     .board(ANGLED.compile_string())
-            //     .build()
-            // ,
-            // MapName::Reverse => MapBuilder::default()
-            //     .name("Angled")
-            //     .board(ANGLED.compile_string())
-            //     .build()
-            // ,
-            // MapName::Spiral => MapBuilder::default()
-            //     .name("Angled")
-            //     .board(ANGLED.compile_string())
-            //     .build()
-            // ,
-            // MapName::Wiggler => MapBuilder::default()
-            //     .name("Angled")
-            //     .board(ANGLED.compile_string())
-            //     .build()
-            // ,
+            MapName::Angled => MapBuilder::default()
+                .name("Angled")
+                .board(ANGLED.compile_string())
+                .build()
+            ,
+            MapName::Danger => MapBuilder::default()
+                .name("Danger")
+                .board(DANGER.compile_string())
+                .build()
+            ,
+            MapName::Reverse => MapBuilder::default()
+                .name("Reverse")
+                .board(REVERSE.compile_string())
+                .build()
+            ,
+            MapName::Spiral => MapBuilder::default()
+                .name("Spiral")
+                .board(SPIRAL.compile_string())
+                .build()
+            ,
+            MapName::Wiggler => MapBuilder::default()
+                .name("Wiggler")
+                .board(WIGGLER.compile_string())
+                .build()
+            ,
             _ => MapBuilder::default()
                 .name("Tutorial")
                 .board(TUTORIAL.compile_string())
@@ -217,7 +239,7 @@ impl MapBuilder
 
 #[cfg(test)]
 mod tests {
-    use super::{MapBuilder, CellBuilder};
+    use super::{MapBuilder, CellBuilder, Direction};
 
     #[test]
     // Nerd Note: The Tutorial Map is 34X12
@@ -251,11 +273,9 @@ mod tests {
 
     #[test]
     fn invalid_characters_fallback() {
-        let test = CellBuilder::build_string("This Does Not Exist");
+        let test = CellBuilder::build_string("How Does This Not Exist");
 
-        for test_cell in test {
-            assert_eq!(test_cell.first().unwrap().background, ',');
-        }
+        assert!(test.is_err() && test == Err("Invalid Character used T".to_string()));
     }
 
     #[test]
@@ -286,5 +306,39 @@ mod tests {
         for chara in test.into_iter() {
             assert!(chara.background == 'H');
         }
+    }
+
+    #[test]
+    fn change_iterator_direction() {
+        let test = MapBuilder::from_named(None).unwrap();
+
+        let mut test_iter = test.into_iter();
+        
+        test_iter.change_direction(Direction::Vertical);
+
+        assert!(test_iter.direction() == Direction::Vertical);
+    }
+
+    #[test]
+    fn check_vertical_versus_horizontal_map() {
+        let test = MapBuilder::from_named(None).unwrap();
+
+        let mut test_iter = test.into_iter();
+        
+        test_iter.change_direction(Direction::Vertical);
+
+        for x in 1..75 {
+            test_iter.next(); 
+        }
+
+        assert!(test_iter.next().unwrap().background == '|' && test_iter.next().unwrap().background == '|');
+
+        test_iter = test.into_iter();
+
+        for x in 1..75 {
+            test_iter.next(); 
+        }
+
+        assert!(test_iter.next().unwrap().background == '|' && test_iter.next().unwrap().background == '_');
     }
 }
