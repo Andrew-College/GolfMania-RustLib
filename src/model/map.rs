@@ -146,7 +146,7 @@ impl<'a> Iterator for MapIntoIterator<'a> {
     type Item = Cell;
 
     fn next(&mut self) -> Option<Self::Item> {
-        if self.x >= self.map.width() && self.y >= self.map.length() {
+        if self.x >= self.map.width() - 1 && self.y >= self.map.length() - 1{
             return None;
         }
 
@@ -340,5 +340,29 @@ mod tests {
         }
 
         assert!(test_iter.next().unwrap().background == '|' && test_iter.next().unwrap().background == '_');
+    }
+
+    #[test]
+    fn iterate_horizontally() {
+        let mut idx = 1;
+
+        for _ in MapBuilder::from_named(None).unwrap().into_iter() { idx = idx + 1; }
+
+        assert_eq!(idx, 408);
+    }
+    
+    #[test]
+    fn iterate_vertically() {
+        let mut idx = 1;
+
+        let elems = MapBuilder::from_named(None).unwrap();
+
+        let mut map_iter = elems.into_iter();
+
+        map_iter.change_direction(Direction::Vertical);
+
+        for _ in map_iter { idx = idx + 1; }
+
+        assert_eq!(idx, 408);
     }
 }

@@ -14,23 +14,23 @@ pub struct InnerModel<T> {
 }
 
 impl<T> InnerModel<T> {
-    fn new() -> InnerModel<T> {
+    pub fn new() -> InnerModel<T> {
         InnerModel {
           State: ActivityState::Inactive,
           Subject: None,
         }
     }
 
-    fn InnerActivate(&mut self) {
+    fn inner_activate(&mut self) {
         // Implement this
         unimplemented!();
     }
 
-    fn InnerDeactivate(&mut self) {
+    fn inner_deactivate(&mut self) {
         unimplemented!();
     }
 
-    fn InnerLoading(&mut self) {
+    fn inner_loading(&mut self) {
         unimplemented!();
     }
 }
@@ -143,7 +143,7 @@ impl<T: PartialEq> IModel for ViewModel<T> {
         //       {
         //         let mut inner_model = self.Inner.take().unwrap();
 
-        //         inner_model.InnerLoading();
+        //         inner_model.inner_loading();
 
         //         self.Inner = Some(inner_model);
         //       }
@@ -173,7 +173,7 @@ impl<T: PartialEq> IModel for ViewModel<T> {
 
                 let mut inner_model = self.Inner.take().unwrap();
 
-                inner_model.InnerActivate();
+                inner_model.inner_activate();
 
                 self.Inner = Some(inner_model);
 
@@ -190,7 +190,7 @@ impl<T: PartialEq> IModel for ViewModel<T> {
 
             let mut inner_model = self.Inner.take().unwrap();
 
-            inner_model.InnerDeactivate();
+            inner_model.inner_deactivate();
 
             self.Inner = Some(inner_model);
 
@@ -205,7 +205,7 @@ impl<T: PartialEq> IModel for ViewModel<T> {
 
             let mut inner_model = self.Inner.take().unwrap();
 
-            inner_model.InnerLoading();
+            inner_model.inner_loading();
 
             self.Inner = Some(inner_model);
 
@@ -215,15 +215,15 @@ impl<T: PartialEq> IModel for ViewModel<T> {
 
 impl<T: PartialEq> StateTransition for InnerModel<T> {
     fn activate(&mut self) {
-        self.InnerActivate();
+        self.inner_activate();
     }
 
     fn deactivate(&mut self) {
-        self.InnerDeactivate();
+        self.inner_deactivate();
     }
 
     fn loading(&mut self) {
-        self.InnerLoading();
+        self.inner_loading();
     }
 }
 
