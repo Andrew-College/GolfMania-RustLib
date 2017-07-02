@@ -39,21 +39,21 @@ impl CellBuilder {
                     '|' =>
                         Ok(
                             Cell {
-                                foreground: '|',
+                                foreground: ' ',
                                 background: '|'
                             }
                         ),
                     '_' =>
                         Ok (
                             Cell {
-                                foreground: '_',
+                                foreground: ' ',
                                 background: '_'
                             }
                         ),
                     '\\' =>
                         Ok (
                             Cell {
-                                foreground: '\\',
+                                foreground: ' ',
                                 background: '\\'
                             }
                         ),
