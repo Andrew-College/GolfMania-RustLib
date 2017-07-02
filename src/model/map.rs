@@ -78,8 +78,15 @@ impl CellBuilder {
                                 background: ',',
                             }
                         ),
+                    '/' =>
+                        Ok(
+                            Cell {
+                              foreground: '/',
+                              background: '/',
+                            }
+                        ),
                     ex =>
-                        return Err(format!("Invalid Character used {}", ex))
+                        return Err(format!("Invalid Character used {}", ex)),
                 }
             ).collect()
     }
@@ -239,7 +246,7 @@ impl MapBuilder
 
 #[cfg(test)]
 mod tests {
-    use super::{MapBuilder, CellBuilder, Direction};
+    use super::{MapBuilder, CellBuilder, Direction, MapName};
 
     #[test]
     // Nerd Note: The Tutorial Map is 34X12
@@ -294,7 +301,7 @@ mod tests {
         let test = MapBuilder::from_named(None).unwrap();
 
         let test_iter = test.into_iter().next().unwrap();
-        
+
         assert!(test_iter.background == 'H');
     }
 
@@ -313,7 +320,7 @@ mod tests {
         let test = MapBuilder::from_named(None).unwrap();
 
         let mut test_iter = test.into_iter();
-        
+
         test_iter.change_direction(Direction::Vertical);
 
         assert!(test_iter.direction() == Direction::Vertical);
@@ -324,11 +331,11 @@ mod tests {
         let test = MapBuilder::from_named(None).unwrap();
 
         let mut test_iter = test.into_iter();
-        
+
         test_iter.change_direction(Direction::Vertical);
 
         for x in 1..75 {
-            test_iter.next(); 
+            test_iter.next();
         }
 
         assert!(test_iter.next().unwrap().background == '|' && test_iter.next().unwrap().background == '|');
@@ -336,7 +343,7 @@ mod tests {
         test_iter = test.into_iter();
 
         for x in 1..75 {
-            test_iter.next(); 
+            test_iter.next();
         }
 
         assert!(test_iter.next().unwrap().background == '|' && test_iter.next().unwrap().background == '_');
@@ -350,7 +357,7 @@ mod tests {
 
         assert_eq!(idx, 408);
     }
-    
+
     #[test]
     fn iterate_vertically() {
         let mut idx = 1;
@@ -364,5 +371,17 @@ mod tests {
         for _ in map_iter { idx = idx + 1; }
 
         assert_eq!(idx, 408);
+    }
+
+    // Noticed I'd missed '/' ^^;
+    #[test]
+    fn build_all_maps()
+    {
+      let MapDefault = MapBuilder::from_named(None).unwrap();
+      let MapAngled = MapBuilder::from_named(Some(MapName::Angled)).unwrap();
+      let MapDanger = MapBuilder::from_named(Some(MapName::Danger)).unwrap();
+      let MapReverse = MapBuilder::from_named(Some(MapName::Reverse)).unwrap();
+      let MapSpiral = MapBuilder::from_named(Some(MapName::Spiral)).unwrap();
+      let MapWiggler = MapBuilder::from_named(Some(MapName::Wiggler)).unwrap();
     }
 }
