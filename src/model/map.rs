@@ -81,7 +81,7 @@ impl CellBuilder {
                     '/' =>
                         Ok(
                             Cell {
-                              foreground: '/',
+                              foreground: ' ',
                               background: '/',
                             }
                         ),
